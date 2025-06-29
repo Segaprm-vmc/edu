@@ -17,7 +17,7 @@ const motorcycles = {
   'vmc-sport-450': {
     id: 'vmc-sport-450',
     name: 'VMC Sport 450',
-    category: 'Спортивные',
+    category: 'Мотоциклы',
     year: 2024,
     price: 'По запросу',
     description: 'Спортивный мотоцикл для динамичной езды',
@@ -55,7 +55,7 @@ const motorcycles = {
   'vmc-cruiser-650': {
     id: 'vmc-cruiser-650',
     name: 'VMC Cruiser 650',
-    category: 'Круизеры',
+    category: 'Мотоциклы',
     year: 2024,
     price: 'По запросу',
     description: 'Комфортный круизер для дальних поездок',
@@ -89,7 +89,7 @@ const motorcycles = {
   'vmc-adventure-800': {
     id: 'vmc-adventure-800',
     name: 'VMC Adventure 800',
-    category: 'Приключенческие',
+    category: 'Эндуро',
     year: 2024,
     price: 'По запросу',
     description: 'Приключенческий мотоцикл для любых дорог',
@@ -283,25 +283,22 @@ export default function ModelDetailPage() {
           </div>
 
           {/* Правая колонка - Информация */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Заголовок */}
             <div>
               <div className="mb-2">
                 <span className="text-sm font-medium text-red-600">{motorcycle.category}</span>
               </div>
               
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{motorcycle.name}</h1>
-              <p className="text-lg text-gray-600">{motorcycle.description}</p>
+              <h1 className="text-3xl font-bold text-gray-900">{motorcycle.name}</h1>
             </div>
 
             {/* Описание модели */}
-            <div className="bg-gray-50 rounded-lg p-6">
+            <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Описание</h3>
-              <div className="prose max-w-none">
-                <p className="text-gray-700 leading-relaxed">
-                  {motorcycle.fullDescription}
-                </p>
-              </div>
+              <p className="text-gray-700 leading-relaxed text-base">
+                {motorcycle.fullDescription}
+              </p>
             </div>
           </div>
         </div>
