@@ -245,8 +245,8 @@ export default function ModelDetailPage() {
           {/* Левая колонка - Изображения */}
           <div className="space-y-4">
             {/* Основное изображение */}
-            <div className={`aspect-video bg-gradient-to-br ${motorcycle.color} rounded-xl overflow-hidden relative flex items-center justify-center shadow-lg`}>
-              <motorcycle.icon className="w-32 h-32 text-white/30" />
+            <div className={`aspect-[4/3] bg-gradient-to-br ${motorcycle.color} rounded-xl overflow-hidden relative flex items-center justify-center shadow-lg`}>
+              <motorcycle.icon className="w-40 h-40 text-white/30" />
               
               {/* Кнопки действий */}
               <div className="absolute top-4 right-4 flex space-x-2">
@@ -267,8 +267,8 @@ export default function ModelDetailPage() {
             </div>
 
             {/* Миниатюры изображений */}
-            <div className="grid grid-cols-4 gap-2">
-              {[...Array(4)].map((_, index) => (
+            <div className="grid grid-cols-6 gap-2">
+              {[...Array(6)].map((_, index) => (
                 <button
                   key={index}
                   className={`aspect-square bg-gradient-to-br ${motorcycle.color} rounded-lg overflow-hidden relative flex items-center justify-center ${
@@ -276,7 +276,7 @@ export default function ModelDetailPage() {
                   }`}
                   onClick={() => setCurrentImageIndex(index)}
                 >
-                  <motorcycle.icon className="w-6 h-6 text-white/50" />
+                  <motorcycle.icon className="w-4 h-4 text-white/50" />
                 </button>
               ))}
             </div>
