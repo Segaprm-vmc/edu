@@ -57,7 +57,7 @@ export default function Sidebar() {
           }
         `}
       >
-        <item.icon className={`${isCollapsed ? 'w-5 h-5' : 'w-4 h-4 mr-3'} flex-shrink-0`} />
+        <item.icon className={`${isCollapsed ? 'w-6 h-6' : 'w-4 h-4 mr-3'} flex-shrink-0`} />
         {!isCollapsed && (
           <>
             <span className="flex-1 font-medium">{item.label}</span>
@@ -77,8 +77,8 @@ export default function Sidebar() {
   const sidebarContent = (
     <div className="h-full flex flex-col bg-gradient-to-b from-gray-900 to-black border-r border-gray-700">
       {/* Заголовок */}
-      <div className={`flex items-center ${isCollapsed ? 'justify-center px-2' : 'justify-between px-4'} py-4 border-b border-gray-700`}>
-        {!isCollapsed && (
+      <div className={`flex items-center ${isCollapsed ? 'justify-center px-3' : 'justify-between px-4'} py-4 border-b border-gray-700`}>
+        {!isCollapsed ? (
           <Link to="/" className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-red-600 rounded-lg flex items-center justify-center">
               <Bike className="w-5 h-5 text-white" />
@@ -88,17 +88,28 @@ export default function Sidebar() {
               <p className="text-gray-400 text-xs">Education Portal</p>
             </div>
           </Link>
+        ) : (
+          <button 
+            onClick={() => setIsCollapsed(false)}
+            className="flex items-center justify-center p-1 hover:bg-gray-700/30 rounded-lg transition-colors"
+          >
+            <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-red-600 rounded-lg flex items-center justify-center">
+              <Bike className="w-6 h-6 text-white" />
+            </div>
+          </button>
         )}
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="hidden lg:flex p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
-        >
-          <Menu className="w-4 h-4" />
-        </button>
+        {!isCollapsed && (
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="hidden lg:flex p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors"
+          >
+            <Menu className="w-4 h-4" />
+          </button>
+        )}
       </div>
 
       {/* Навигация по категориям */}
-      <nav className="flex-1 px-4 py-4">
+      <nav className={`flex-1 ${isCollapsed ? 'px-2' : 'px-4'} py-4`}>
         <div className="mb-4">
           {!isCollapsed && (
             <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">
@@ -114,7 +125,7 @@ export default function Sidebar() {
       </nav>
 
       {/* Статус */}
-      <div className="px-4 py-3 border-t border-gray-700">
+      <div className={`${isCollapsed ? 'px-2' : 'px-4'} py-3 border-t border-gray-700`}>
         <div className="flex items-center space-x-2">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
           {!isCollapsed && <span className="text-xs text-gray-400">Система активна</span>}

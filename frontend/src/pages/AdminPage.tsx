@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Settings, 
   Users, 
@@ -12,13 +13,17 @@ import {
   Upload,
   Download,
   Eye,
-  Lock
+  Lock,
+  ArrowLeft
 } from 'lucide-react';
 
 const AdminPage: React.FC = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    localStorage.getItem('isAdminAuthenticated') === 'true'
+  );
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -148,12 +153,25 @@ const AdminPage: React.FC = () => {
               </h1>
               <p className="text-gray-600">Управление контентом образовательного портала</p>
             </div>
-            <button 
-              onClick={() => setIsAuthenticated(false)}
-              className="text-gray-600 hover:text-gray-900 px-4 py-2"
-            >
-              Выйти
-            </button>
+            <div className="flex items-center space-x-3">
+              <button 
+                onClick={() => navigate('/')}
+                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>На сайт</span>
+              </button>
+              <button 
+                onClick={() => {
+                  setIsAuthenticated(false);
+                  localStorage.removeItem('isAdminAuthenticated');
+                  navigate('/admin/login');
+                }}
+                className="text-gray-600 hover:text-gray-900 px-4 py-2"
+              >
+                Выйти
+              </button>
+            </div>
           </div>
         </div>
       </div>
