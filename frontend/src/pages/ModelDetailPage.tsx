@@ -7,10 +7,6 @@ import {
   Download, 
   ChevronLeft, 
   ChevronRight,
-  ChevronDown,
-  ChevronUp,
-  Star,
-  Award,
   Zap,
   Shield
 } from 'lucide-react';
@@ -24,7 +20,6 @@ const motorcycles = {
     category: 'Спортивные',
     year: 2024,
     price: 'По запросу',
-    rating: 4.8,
     description: 'Спортивный мотоцикл для динамичной езды',
     fullDescription: 'VMC Sport 450 — это воплощение спортивного духа и передовых технологий. Разработанный для тех, кто ценит скорость и маневренность, этот мотоцикл обеспечивает незабываемые впечатления от каждой поездки.',
     features: [
@@ -63,7 +58,6 @@ const motorcycles = {
     category: 'Круизеры',
     year: 2024,
     price: 'По запросу',
-    rating: 4.6,
     description: 'Комфортный круизер для дальних поездок',
     fullDescription: 'VMC Cruiser 650 создан для тех, кто ценит комфорт и стиль в дальних путешествиях. Классический дизайн сочетается с современными технологиями.',
     features: [
@@ -98,7 +92,6 @@ const motorcycles = {
     category: 'Приключенческие',
     year: 2024,
     price: 'По запросу',
-    rating: 4.9,
     description: 'Приключенческий мотоцикл для любых дорог',
     fullDescription: 'VMC Adventure 800 — универсальный мотоцикл для истинных искателей приключений. Одинаково уверенно чувствует себя как на асфальте, так и на бездорожье.',
     features: [
@@ -109,7 +102,7 @@ const motorcycles = {
       'Система ABS и трекшн-контроль'
     ],
     color: 'from-green-500 to-green-600',
-    icon: Star,
+    icon: Zap,
     salesScript: {
       intro: 'VMC Adventure 800 откроет для вас мир безграничных возможностей!',
       benefits: [
@@ -132,8 +125,6 @@ const motorcycles = {
 export default function ModelDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [showFullDescription, setShowFullDescription] = useState(false);
-  const [showSalesScript, setShowSalesScript] = useState(false);
   const [activeTab, setActiveTab] = useState<'specs' | 'features'>('specs');
 
   const motorcycle = id ? motorcycles[id as keyof typeof motorcycles] : null;
@@ -293,15 +284,10 @@ export default function ModelDetailPage() {
 
           {/* Правая колонка - Информация */}
           <div className="space-y-6">
-            {/* Заголовок и рейтинг */}
+            {/* Заголовок */}
             <div>
-              <div className="flex items-center justify-between mb-2">
+              <div className="mb-2">
                 <span className="text-sm font-medium text-red-600">{motorcycle.category}</span>
-                <div className="flex items-center space-x-1">
-                  <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                  <span className="text-sm text-gray-600">{motorcycle.rating}</span>
-                  <span className="text-xs text-gray-400">(245 отзывов)</span>
-                </div>
               </div>
               
               <h1 className="text-3xl font-bold text-gray-900 mb-2">{motorcycle.name}</h1>
@@ -326,7 +312,7 @@ export default function ModelDetailPage() {
             <nav className="-mb-px flex space-x-8">
               {[
                 { id: 'specs', label: 'Характеристики' },
-                { id: 'features', label: 'Особенности' }
+                { id: 'features', label: 'Скрипт продаж' }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -352,78 +338,55 @@ export default function ModelDetailPage() {
             )}
 
             {activeTab === 'features' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {motorcycle.features.map((feature, index) => (
-                  <div key={index} className="flex items-start space-x-3">
-                    <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Award className="w-3 h-3 text-red-600" />
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900">{feature}</h4>
-                      <p className="text-sm text-gray-600 mt-1">
-                        Подробное описание особенности {feature.toLowerCase()}.
-                      </p>
+              <div className="bg-blue-50 rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-blue-900 mb-6">
+                  📋 Скрипт продаж для менеджеров
+                </h3>
+                
+                <div className="space-y-6">
+                  <div>
+                    <h4 className="font-medium text-blue-900 mb-3">Введение:</h4>
+                    <p className="text-blue-800 bg-white rounded-lg p-4">{motorcycle.salesScript.intro}</p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium text-blue-900 mb-3">Преимущества:</h4>
+                    <div className="bg-white rounded-lg p-4">
+                      <ul className="list-disc list-inside space-y-2">
+                        {motorcycle.salesScript.benefits.map((benefit, index) => (
+                          <li key={index} className="text-blue-800">{benefit}</li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
-                ))}
+                  
+                  <div>
+                    <h4 className="font-medium text-blue-900 mb-3">Ответы на возражения:</h4>
+                    <div className="space-y-3">
+                      {motorcycle.salesScript.objections.map((objection, index) => (
+                        <div key={index} className="bg-white rounded-lg p-4">
+                          <p className="font-medium text-gray-900 mb-2">
+                            ❓ {objection.question}
+                          </p>
+                          <p className="text-gray-700">
+                            ✅ {objection.answer}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="font-medium text-blue-900 mb-3">Закрытие сделки:</h4>
+                    <p className="text-blue-800 font-medium bg-white rounded-lg p-4">{motorcycle.salesScript.closing}</p>
+                  </div>
+                </div>
               </div>
             )}
           </div>
         </div>
 
-        {/* Скрипт продаж для менеджеров */}
-        <div className="mt-12 bg-blue-50 rounded-lg p-6">
-          <button
-            onClick={() => setShowSalesScript(!showSalesScript)}
-            className="flex items-center justify-between w-full text-left"
-          >
-            <h3 className="text-lg font-semibold text-blue-900">
-              📋 Скрипт продаж для менеджеров
-            </h3>
-            {showSalesScript ? (
-              <ChevronUp className="w-5 h-5 text-blue-600" />
-            ) : (
-              <ChevronDown className="w-5 h-5 text-blue-600" />
-            )}
-          </button>
-          
-          {showSalesScript && (
-            <div className="mt-4 space-y-4">
-              <div>
-                <h4 className="font-medium text-blue-900 mb-2">Введение:</h4>
-                <p className="text-blue-800">{motorcycle.salesScript.intro}</p>
-              </div>
-              
-              <div>
-                <h4 className="font-medium text-blue-900 mb-2">Преимущества:</h4>
-                <ul className="list-disc list-inside space-y-1">
-                  {motorcycle.salesScript.benefits.map((benefit, index) => (
-                    <li key={index} className="text-blue-800">{benefit}</li>
-                  ))}
-                </ul>
-              </div>
-              
-              <div>
-                <h4 className="font-medium text-blue-900 mb-2">Ответы на возражения:</h4>
-                {motorcycle.salesScript.objections.map((objection, index) => (
-                  <div key={index} className="bg-white rounded p-3 mb-2">
-                    <p className="font-medium text-gray-900 mb-1">
-                      ❓ {objection.question}
-                    </p>
-                    <p className="text-gray-700">
-                      ✅ {objection.answer}
-                    </p>
-                  </div>
-                ))}
-              </div>
-              
-              <div>
-                <h4 className="font-medium text-blue-900 mb-2">Закрытие сделки:</h4>
-                <p className="text-blue-800 font-medium">{motorcycle.salesScript.closing}</p>
-              </div>
-            </div>
-          )}
-        </div>
+
       </div>
     </div>
   );

@@ -159,45 +159,7 @@ const MotorcycleSpecs: React.FC<MotorcycleSpecsProps> = ({
         ))}
       </div>
 
-      {/* Общая статистика */}
-      <div className="mt-8 bg-gray-50 rounded-lg p-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 text-center">
-          <div>
-            <div className="text-2xl font-bold text-gray-900">{specs.length}</div>
-            <div className="text-sm text-gray-600">Всего</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-red-600">
-              {specsByCategory.engine?.length || 0}
-            </div>
-            <div className="text-sm text-gray-600">Двигатель</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-blue-600">
-              {specsByCategory.chassis?.length || 0}
-            </div>
-            <div className="text-sm text-gray-600">Шасси</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-green-600">
-              {specsByCategory.brakes?.length || 0}
-            </div>
-            <div className="text-sm text-gray-600">Тормоза</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-purple-600">
-              {specsByCategory.electrical?.length || 0}
-            </div>
-            <div className="text-sm text-gray-600">Электрика</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-orange-600">
-              {specsByCategory.dimensions?.length || 0}
-            </div>
-            <div className="text-sm text-gray-600">Габариты</div>
-          </div>
-        </div>
-      </div>
+
     </div>
   );
 };

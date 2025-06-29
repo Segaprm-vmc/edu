@@ -7,7 +7,6 @@ interface MotorcycleModel {
   name: string;
   type: string;
   year: number;
-  rating: number;
   description: string;
   features: string[];
   price: string;
@@ -21,7 +20,6 @@ const motorcycleModels: MotorcycleModel[] = [
     name: 'VMC Sport 450',
     type: 'Мотоцикл',
     year: 2024,
-    rating: 4.8,
     description: 'VMC Sport 450 — это воплощение спортивного духа и передовых технологий. Разработанный для тех, кто ценит скорость и маневренность, этот мотоцикл обеспечивает незабываемые впечатления от каждой поездки.',
     features: ['Мощный двигатель 450cc', 'Спортивная посадка', 'Карбоновые детали', 'LED-освещение', 'Цифровая приборная панель'],
     price: 'По запросу',
@@ -33,7 +31,6 @@ const motorcycleModels: MotorcycleModel[] = [
     name: 'VMC Cruiser 650',
     type: 'Мотоцикл',
     year: 2024,
-    rating: 4.6,
     description: 'VMC Cruiser 650 создан для комфортных дальних поездок. Сочетает в себе классический дизайн и современные технологии для максимального удовольствия от путешествий.',
     features: ['Двигатель 650cc', 'Комфортная посадка', 'Увеличенный топливный бак', 'Круиз-контроль', 'Система навигации'],
     price: 'По запросу',
@@ -45,7 +42,6 @@ const motorcycleModels: MotorcycleModel[] = [
     name: 'VMC Adventure 800',
     type: 'Эндуро',
     year: 2024,
-    rating: 4.9,
     description: 'VMC Adventure 800 — универсальный мотоцикл для любых дорог. От городских улиц до бездорожья, этот байк готов к любым приключениям.',
     features: ['Двигатель 800cc', 'Защита от падений', 'Регулируемая подвеска', 'Система ABS', 'Багажная система'],
     price: 'По запросу',
@@ -57,7 +53,6 @@ const motorcycleModels: MotorcycleModel[] = [
     name: 'VMC Scooter 150',
     type: 'Скутер',
     year: 2024,
-    rating: 4.4,
     description: 'VMC Scooter 150 — идеальный городской транспорт. Экономичный, маневренный и стильный скутер для ежедневных поездок по городу.',
     features: ['Двигатель 150cc', 'Автоматическая трансмиссия', 'Большой багажник', 'LED-фары', 'Экономичный расход'],
     price: 'По запросу',
@@ -69,7 +64,6 @@ const motorcycleModels: MotorcycleModel[] = [
     name: 'VMC Moped 50',
     type: 'Мопед',
     year: 2024,
-    rating: 4.2,
     description: 'VMC Moped 50 — легкий и удобный мопед для городских поездок. Не требует прав категории А, экономичный и надежный.',
     features: ['Двигатель 50cc', 'Легкий вес', 'Простое управление', 'Низкий расход топлива', 'Доступная цена'],
     price: 'По запросу',
@@ -81,7 +75,6 @@ const motorcycleModels: MotorcycleModel[] = [
     name: 'VMC PitBike 125',
     type: 'Питбайк',
     year: 2024,
-    rating: 4.7,
     description: 'VMC PitBike 125 — компактный и мощный питбайк для экстремального вождения. Отлично подходит для трюков и бездорожья.',
     features: ['Двигатель 125cc', 'Усиленная рама', 'Кроссовая резина', 'Короткая база', 'Спортивная подвеска'],
     price: 'По запросу',
@@ -93,7 +86,6 @@ const motorcycleModels: MotorcycleModel[] = [
     name: 'VMC Enduro 250',
     type: 'Эндуро',
     year: 2024,
-    rating: 4.8,
     description: 'VMC Enduro 250 — настоящий внедорожник. Создан для покорения самых сложных маршрутов и бездорожья.',
     features: ['Двигатель 250cc', 'Длинноходная подвеска', 'Защита двигателя', 'Кроссовые покрышки', 'Высокий клиренс'],
     price: 'По запросу',
