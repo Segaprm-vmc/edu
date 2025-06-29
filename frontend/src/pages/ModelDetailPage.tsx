@@ -134,7 +134,7 @@ export default function ModelDetailPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [showSalesScript, setShowSalesScript] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'specs' | 'features'>('overview');
+  const [activeTab, setActiveTab] = useState<'specs' | 'features'>('specs');
 
   const motorcycle = id ? motorcycles[id as keyof typeof motorcycles] : null;
 
@@ -263,39 +263,13 @@ export default function ModelDetailPage() {
               <p className="text-lg text-gray-600">{motorcycle.description}</p>
             </div>
 
-            {/* Цена и кнопки */}
+            {/* Описание модели */}
             <div className="bg-gray-50 rounded-lg p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <p className="text-sm text-gray-500">Цена</p>
-                  <p className="text-2xl font-bold text-gray-900">{motorcycle.price}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm text-gray-500">Год выпуска</p>
-                  <p className="text-lg font-semibold text-gray-900">{motorcycle.year}</p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-3">
-                <button className="px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium">
-                  Купить сейчас
-                </button>
-                <button className="px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
-                  Тест-драйв
-                </button>
-              </div>
-            </div>
-
-            {/* Ключевые особенности */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Ключевые особенности</h3>
-              <div className="grid grid-cols-1 gap-2">
-                {motorcycle.features.map((feature, index) => (
-                  <div key={index} className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                    <span className="text-gray-700">{feature}</span>
-                  </div>
-                ))}
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Описание</h3>
+              <div className="prose max-w-none">
+                <p className="text-gray-700 leading-relaxed">
+                  {motorcycle.fullDescription}
+                </p>
               </div>
             </div>
           </div>
@@ -306,7 +280,6 @@ export default function ModelDetailPage() {
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8">
               {[
-                { id: 'overview', label: 'Обзор' },
                 { id: 'specs', label: 'Характеристики' },
                 { id: 'features', label: 'Особенности' }
               ].map((tab) => (
@@ -326,14 +299,6 @@ export default function ModelDetailPage() {
           </div>
 
           <div className="py-8">
-            {activeTab === 'overview' && (
-              <div className="prose max-w-none">
-                <p className="text-gray-700 leading-relaxed">
-                  {motorcycle.fullDescription}
-                </p>
-              </div>
-            )}
-
             {activeTab === 'specs' && (
               <MotorcycleSpecs 
                 modelName={motorcycle.name}
