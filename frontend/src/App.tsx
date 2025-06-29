@@ -9,6 +9,8 @@ import NewsPage from './pages/NewsPage';
 import RegulationsPage from './pages/RegulationsPage';
 import EmployeesPage from './pages/EmployeesPage';
 import AdminPage from './pages/AdminPage';
+import AdminLoginPage from './pages/AdminLoginPage';
+import ProtectedRoute from './components/ProtectedRoute';
 
 // Loading компонент
 const LoadingSpinner = () => (
@@ -67,17 +69,34 @@ function App() {
         }}
       >
         <Suspense fallback={<LoadingSpinner />}>
-          <MainLayout>
-            <Routes>
-              <Route path="/" element={<ModelsPage />} />
-              <Route path="/models" element={<ModelsPage />} />
-              <Route path="/models/:id" element={<ModelDetailPage />} />
-              <Route path="/news" element={<NewsPage />} />
-              <Route path="/regulations" element={<RegulationsPage />} />
-              <Route path="/employees" element={<EmployeesPage />} />
-              <Route path="/admin" element={<AdminPage />} />
-            </Routes>
-          </MainLayout>
+          <Routes>
+            {/* Страница входа администратора без MainLayout */}
+            <Route path="/admin/login" element={<AdminLoginPage />} />
+            
+            {/* Защищённая админ панель без MainLayout */}
+            <Route 
+              path="/admin" 
+              element={
+                <ProtectedRoute>
+                  <AdminPage />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Обычные страницы с MainLayout */}
+            <Route path="/*" element={
+              <MainLayout>
+                <Routes>
+                  <Route path="/" element={<ModelsPage />} />
+                  <Route path="/models" element={<ModelsPage />} />
+                  <Route path="/models/:id" element={<ModelDetailPage />} />
+                  <Route path="/news" element={<NewsPage />} />
+                  <Route path="/regulations" element={<RegulationsPage />} />
+                  <Route path="/employees" element={<EmployeesPage />} />
+                </Routes>
+              </MainLayout>
+            } />
+          </Routes>
         </Suspense>
       </Router>
     </ErrorBoundary>

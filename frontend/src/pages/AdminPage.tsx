@@ -73,10 +73,6 @@ const AdminPage: React.FC = () => {
               Войти
             </button>
           </form>
-
-          <div className="mt-6 text-center text-sm text-gray-500">
-            Для демонстрации используйте пароль: <code className="bg-gray-100 px-2 py-1 rounded">admin123</code>
-          </div>
         </div>
       </div>
     );
