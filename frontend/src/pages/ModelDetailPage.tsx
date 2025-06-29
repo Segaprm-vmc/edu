@@ -154,35 +154,80 @@ export default function ModelDetailPage() {
   // Генерируем характеристики на основе модели
   const getSpecs = (motorcycleId: string) => {
     const baseSpecs = [
-      { id: 1, spec_name: 'Тип двигателя', spec_value: '4-тактный', category: 'engine', sort_order: 1 },
-      { id: 4, spec_name: 'Длина', spec_value: '2150', spec_unit: 'мм', category: 'dimensions', sort_order: 1 },
-      { id: 5, spec_name: 'Ширина', spec_value: '850', spec_unit: 'мм', category: 'dimensions', sort_order: 2 },
-      { id: 6, spec_name: 'Высота', spec_value: '1200', spec_unit: 'мм', category: 'dimensions', sort_order: 3 },
+      // Двигатель
+      { id: 1, spec_name: 'Тип двигателя', spec_value: '4-тактный одноцилиндровый', category: 'engine', sort_order: 1 },
+      { id: 2, spec_name: 'Система охлаждения', spec_value: 'Жидкостное', category: 'engine', sort_order: 2 },
+      { id: 3, spec_name: 'Система питания', spec_value: 'Электронный впрыск EFI', category: 'engine', sort_order: 3 },
+      { id: 4, spec_name: 'Система зажигания', spec_value: 'Электронная CDI', category: 'engine', sort_order: 4 },
+      { id: 5, spec_name: 'Коробка передач', spec_value: '6-ступенчатая', category: 'engine', sort_order: 5 },
+      { id: 6, spec_name: 'Сцепление', spec_value: 'Многодисковое в масляной ванне', category: 'engine', sort_order: 6 },
+      
+      // Шасси и подвеска
+      { id: 20, spec_name: 'Тип рамы', spec_value: 'Стальная трубчатая', category: 'chassis', sort_order: 1 },
+      { id: 21, spec_name: 'Передняя подвеска', spec_value: 'Телескопическая вилка', category: 'chassis', sort_order: 2 },
+      { id: 22, spec_name: 'Задняя подвеска', spec_value: 'Маятниковая с моноамортизатором', category: 'chassis', sort_order: 3 },
+      { id: 23, spec_name: 'Ход передней подвески', spec_value: '300', spec_unit: 'мм', category: 'chassis', sort_order: 4 },
+      { id: 24, spec_name: 'Ход задней подвески', spec_value: '280', spec_unit: 'мм', category: 'chassis', sort_order: 5 },
+      
+      // Тормозная система
+      { id: 30, spec_name: 'Передний тормоз', spec_value: 'Дисковый 300мм', category: 'brakes', sort_order: 1 },
+      { id: 31, spec_name: 'Задний тормоз', spec_value: 'Дисковый 240мм', category: 'brakes', sort_order: 2 },
+      { id: 32, spec_name: 'ABS', spec_value: 'Есть', category: 'brakes', sort_order: 3 },
+      
+      // Колеса и шины
+      { id: 40, spec_name: 'Переднее колесо', spec_value: '21" x 1.60', category: 'wheels', sort_order: 1 },
+      { id: 41, spec_name: 'Заднее колесо', spec_value: '18" x 2.15', category: 'wheels', sort_order: 2 },
+      { id: 42, spec_name: 'Передняя шина', spec_value: '90/90-21 54H', category: 'wheels', sort_order: 3 },
+      { id: 43, spec_name: 'Задняя шина', spec_value: '120/80-18 62H', category: 'wheels', sort_order: 4 },
+      
+      // Габариты и масса
+      { id: 50, spec_name: 'Длина', spec_value: '2150', spec_unit: 'мм', category: 'dimensions', sort_order: 1 },
+      { id: 51, spec_name: 'Ширина', spec_value: '850', spec_unit: 'мм', category: 'dimensions', sort_order: 2 },
+      { id: 52, spec_name: 'Высота', spec_value: '1200', spec_unit: 'мм', category: 'dimensions', sort_order: 3 },
+      { id: 53, spec_name: 'Высота сиденья', spec_value: '830', spec_unit: 'мм', category: 'dimensions', sort_order: 4 },
+      { id: 54, spec_name: 'Колесная база', spec_value: '1450', spec_unit: 'мм', category: 'dimensions', sort_order: 5 },
+      { id: 55, spec_name: 'Дорожный просвет', spec_value: '250', spec_unit: 'мм', category: 'dimensions', sort_order: 6 },
+      
+      // Электрооборудование
+      { id: 60, spec_name: 'Фара', spec_value: 'LED', category: 'electrical', sort_order: 1 },
+      { id: 61, spec_name: 'Задний фонарь', spec_value: 'LED', category: 'electrical', sort_order: 2 },
+      { id: 62, spec_name: 'Поворотники', spec_value: 'LED', category: 'electrical', sort_order: 3 },
+      { id: 63, spec_name: 'Приборная панель', spec_value: 'Цифровая LCD', category: 'electrical', sort_order: 4 },
+      { id: 64, spec_name: 'Аккумулятор', spec_value: '12V 8Ah', category: 'electrical', sort_order: 5 },
+      
+      // Дополнительные особенности
+      { id: 70, spec_name: 'Объем топливного бака', spec_value: '9.5', spec_unit: 'л', category: 'features', sort_order: 1 },
+      { id: 71, spec_name: 'Запуск', spec_value: 'Электростартер', category: 'features', sort_order: 2 },
+      { id: 72, spec_name: 'Защита двигателя', spec_value: 'Есть', category: 'features', sort_order: 3 },
+      { id: 73, spec_name: 'Ветровое стекло', spec_value: 'Регулируемое', category: 'features', sort_order: 4 }
     ];
 
     if (motorcycleId.includes('450')) {
       baseSpecs.push(
-        { id: 2, spec_name: 'Объем двигателя', spec_value: '450', spec_unit: 'куб.см', category: 'engine', sort_order: 2 },
-        { id: 3, spec_name: 'Максимальная мощность', spec_value: '45', spec_unit: 'л.с.', category: 'engine', sort_order: 3 },
-        { id: 7, spec_name: 'Снаряженная масса', spec_value: '165', spec_unit: 'кг', category: 'dimensions', sort_order: 4 },
-        { id: 8, spec_name: 'Максимальная скорость', spec_value: '180', spec_unit: 'км/ч', category: 'performance', sort_order: 1 },
-        { id: 9, spec_name: 'Расход топлива', spec_value: '3.5', spec_unit: 'л/100км', category: 'performance', sort_order: 2 }
+        { id: 10, spec_name: 'Объем двигателя', spec_value: '450', spec_unit: 'куб.см', category: 'engine', sort_order: 7 },
+        { id: 11, spec_name: 'Максимальная мощность', spec_value: '45', spec_unit: 'л.с.', category: 'engine', sort_order: 8 },
+        { id: 12, spec_name: 'Максимальный крутящий момент', spec_value: '38', spec_unit: 'Нм', category: 'engine', sort_order: 9 },
+        { id: 56, spec_name: 'Снаряженная масса', spec_value: '165', spec_unit: 'кг', category: 'dimensions', sort_order: 7 },
+        { id: 80, spec_name: 'Максимальная скорость', spec_value: '180', spec_unit: 'км/ч', category: 'performance', sort_order: 1 },
+        { id: 81, spec_name: 'Расход топлива', spec_value: '3.5', spec_unit: 'л/100км', category: 'performance', sort_order: 2 }
       );
     } else if (motorcycleId.includes('650')) {
       baseSpecs.push(
-        { id: 2, spec_name: 'Объем двигателя', spec_value: '650', spec_unit: 'куб.см', category: 'engine', sort_order: 2 },
-        { id: 3, spec_name: 'Максимальная мощность', spec_value: '65', spec_unit: 'л.с.', category: 'engine', sort_order: 3 },
-        { id: 7, spec_name: 'Снаряженная масса', spec_value: '220', spec_unit: 'кг', category: 'dimensions', sort_order: 4 },
-        { id: 8, spec_name: 'Максимальная скорость', spec_value: '160', spec_unit: 'км/ч', category: 'performance', sort_order: 1 },
-        { id: 9, spec_name: 'Расход топлива', spec_value: '3.2', spec_unit: 'л/100км', category: 'performance', sort_order: 2 }
+        { id: 10, spec_name: 'Объем двигателя', spec_value: '650', spec_unit: 'куб.см', category: 'engine', sort_order: 7 },
+        { id: 11, spec_name: 'Максимальная мощность', spec_value: '65', spec_unit: 'л.с.', category: 'engine', sort_order: 8 },
+        { id: 12, spec_name: 'Максимальный крутящий момент', spec_value: '58', spec_unit: 'Нм', category: 'engine', sort_order: 9 },
+        { id: 56, spec_name: 'Снаряженная масса', spec_value: '220', spec_unit: 'кг', category: 'dimensions', sort_order: 7 },
+        { id: 80, spec_name: 'Максимальная скорость', spec_value: '160', spec_unit: 'км/ч', category: 'performance', sort_order: 1 },
+        { id: 81, spec_name: 'Расход топлива', spec_value: '3.2', spec_unit: 'л/100км', category: 'performance', sort_order: 2 }
       );
     } else if (motorcycleId.includes('800')) {
       baseSpecs.push(
-        { id: 2, spec_name: 'Объем двигателя', spec_value: '800', spec_unit: 'куб.см', category: 'engine', sort_order: 2 },
-        { id: 3, spec_name: 'Максимальная мощность', spec_value: '80', spec_unit: 'л.с.', category: 'engine', sort_order: 3 },
-        { id: 7, spec_name: 'Снаряженная масса', spec_value: '190', spec_unit: 'кг', category: 'dimensions', sort_order: 4 },
-        { id: 8, spec_name: 'Максимальная скорость', spec_value: '170', spec_unit: 'км/ч', category: 'performance', sort_order: 1 },
-        { id: 9, spec_name: 'Расход топлива', spec_value: '3.2', spec_unit: 'л/100км', category: 'performance', sort_order: 2 }
+        { id: 10, spec_name: 'Объем двигателя', spec_value: '800', spec_unit: 'куб.см', category: 'engine', sort_order: 7 },
+        { id: 11, spec_name: 'Максимальная мощность', spec_value: '80', spec_unit: 'л.с.', category: 'engine', sort_order: 8 },
+        { id: 12, spec_name: 'Максимальный крутящий момент', spec_value: '68', spec_unit: 'Нм', category: 'engine', sort_order: 9 },
+        { id: 56, spec_name: 'Снаряженная масса', spec_value: '190', spec_unit: 'кг', category: 'dimensions', sort_order: 7 },
+        { id: 80, spec_name: 'Максимальная скорость', spec_value: '170', spec_unit: 'км/ч', category: 'performance', sort_order: 1 },
+        { id: 81, spec_name: 'Расход топлива', spec_value: '3.2', spec_unit: 'л/100км', category: 'performance', sort_order: 2 }
       );
     }
 
