@@ -13,6 +13,7 @@ class Model(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String(255), index=True)
     description: Mapped[Optional[str]] = mapped_column(Text)
+    category: Mapped[Optional[str]] = mapped_column(String(100))
     sales_script: Mapped[Optional[str]] = mapped_column(Text)
     is_active: Mapped[bool] = mapped_column(default=True)
     sort_order: Mapped[int] = mapped_column(default=0)
@@ -62,6 +63,7 @@ class ModelSpec(Base):
     spec_name: Mapped[str] = mapped_column(String(255))
     spec_value: Mapped[str] = mapped_column(String(500))
     spec_unit: Mapped[Optional[str]] = mapped_column(String(50))
+    category: Mapped[Optional[str]] = mapped_column(String(100))
     sort_order: Mapped[int] = mapped_column(default=0)
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     

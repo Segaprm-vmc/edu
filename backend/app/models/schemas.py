@@ -14,6 +14,8 @@ class ModelVideoBase(BaseModel):
     sort_order: int = 0
 
 class ModelVideoCreate(ModelVideoBase):
+    model_config = ConfigDict(protected_namespaces=())
+    
     model_id: int
 
 class ModelVideoUpdate(BaseModel):
@@ -33,15 +35,19 @@ class ModelSpecBase(BaseModel):
     spec_name: str
     spec_value: str
     spec_unit: Optional[str] = None
+    category: Optional[str] = None
     sort_order: int = 0
 
 class ModelSpecCreate(ModelSpecBase):
+    model_config = ConfigDict(protected_namespaces=())
+    
     model_id: int
 
 class ModelSpecUpdate(BaseModel):
     spec_name: Optional[str] = None
     spec_value: Optional[str] = None
     spec_unit: Optional[str] = None
+    category: Optional[str] = None
     sort_order: Optional[int] = None
 
 class ModelSpec(ModelSpecBase):
@@ -60,6 +66,8 @@ class ModelPhotoBase(BaseModel):
     sort_order: int = 0
 
 class ModelPhotoCreate(ModelPhotoBase):
+    model_config = ConfigDict(protected_namespaces=())
+    
     model_id: int
 
 class ModelPhoto(ModelPhotoBase):
@@ -72,6 +80,7 @@ class ModelPhoto(ModelPhotoBase):
 class ModelBase(BaseModel):
     name: str
     description: Optional[str] = None
+    category: Optional[str] = None
     sales_script: Optional[str] = None
     is_active: bool = True
     sort_order: int = 0
@@ -82,6 +91,7 @@ class ModelCreate(ModelBase):
 class ModelUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
+    category: Optional[str] = None
     sales_script: Optional[str] = None
     is_active: Optional[bool] = None
     sort_order: Optional[int] = None
@@ -97,6 +107,13 @@ class Model(ModelBase):
     videos: List[ModelVideo] = []
     photos: List[ModelPhoto] = []
     specs: List[ModelSpec] = []
+
+class ModelSimple(ModelBase):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    created_at: datetime
+    updated_at: Optional[datetime] = None
 
 # Схемы для новостей
 class NewsPhotoBase(BaseModel):

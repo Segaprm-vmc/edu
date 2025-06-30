@@ -1,18 +1,20 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+from sqlalchemy import select, and_, or_
 from typing import List, Optional
 from app.db.database import get_db
 from app.models import database as db_models
 from app.models import schemas
-from sqlalchemy import and_, or_
 
 router = APIRouter()
 
 # Эндпоинты для проверки видимости разделов
 @router.get("/sections/visibility", response_model=dict)
-async def get_sections_visibility(db: Session = Depends(get_db)):
+async def get_sections_visibility(db: AsyncSession = Depends(get_db)):
     """Получить настройки видимости разделов"""
-    sections = db.query(db_models.SectionVisibility).all()
+    result = await db.execute(select(db_models.SectionVisibility))
+    sections = result.scalars().all()
     visibility = {}
     
     # Значения по умолчанию
@@ -33,10 +35,14 @@ async def get_models(
     limit: int = Query(100, ge=1, le=1000),
     search: Optional[str] = Query(None),
     is_active: bool = Query(True),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Получить список моделей мотоциклов"""
-    query = db.query(db_models.Model).filter(db_models.Model.is_active == is_active)
+    query = select(db_models.Model).options(
+        selectinload(db_models.Model.photos),
+        selectinload(db_models.Model.specs),
+        selectinload(db_models.Model.videos)
+    ).filter(db_models.Model.is_active == is_active)
     
     if search:
         query = query.filter(
@@ -47,19 +53,29 @@ async def get_models(
         )
     
     query = query.order_by(db_models.Model.sort_order, db_models.Model.name)
-    models = query.offset(skip).limit(limit).all()
+    query = query.offset(skip).limit(limit)
+    
+    result = await db.execute(query)
+    models = result.scalars().all()
     
     return models
 
 @router.get("/models/{model_id}", response_model=schemas.Model)
-async def get_model(model_id: int, db: Session = Depends(get_db)):
+async def get_model(model_id: int, db: AsyncSession = Depends(get_db)):
     """Получить модель мотоцикла по ID"""
-    model = db.query(db_models.Model).filter(
+    query = select(db_models.Model).options(
+        selectinload(db_models.Model.photos),
+        selectinload(db_models.Model.specs),
+        selectinload(db_models.Model.videos)
+    ).filter(
         and_(
             db_models.Model.id == model_id,
             db_models.Model.is_active == True
         )
-    ).first()
+    )
+    
+    result = await db.execute(query)
+    model = result.scalars().first()
     
     if not model:
         raise HTTPException(status_code=404, detail="Модель не найдена")
@@ -71,15 +87,18 @@ async def get_model_specs(
     model_id: int,
     category: Optional[str] = Query(None),
     search: Optional[str] = Query(None),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Получить характеристики модели"""
     # Проверяем существование модели
-    model = db.query(db_models.Model).filter(db_models.Model.id == model_id).first()
+    model_query = select(db_models.Model).filter(db_models.Model.id == model_id)
+    model_result = await db.execute(model_query)
+    model = model_result.scalars().first()
+    
     if not model:
         raise HTTPException(status_code=404, detail="Модель не найдена")
     
-    query = db.query(db_models.ModelSpec).filter(db_models.ModelSpec.model_id == model_id)
+    query = select(db_models.ModelSpec).filter(db_models.ModelSpec.model_id == model_id)
     
     if category:
         query = query.filter(db_models.ModelSpec.category == category)
@@ -92,27 +111,56 @@ async def get_model_specs(
             )
         )
     
-    specs = query.order_by(db_models.ModelSpec.sort_order, db_models.ModelSpec.spec_name).all()
+    query = query.order_by(db_models.ModelSpec.sort_order, db_models.ModelSpec.spec_name)
+    result = await db.execute(query)
+    specs = result.scalars().all()
+    
     return specs
 
-@router.get("/models/{model_id}/videos", response_model=List[schemas.ModelVideo])
-async def get_model_videos(model_id: int, db: Session = Depends(get_db)):
-    """Получить видео модели"""
+@router.get("/models/{model_id}/photos", response_model=List[schemas.ModelPhoto])
+async def get_model_photos(model_id: int, db: AsyncSession = Depends(get_db)):
+    """Получить фотографии модели"""
     # Проверяем существование модели
-    model = db.query(db_models.Model).filter(db_models.Model.id == model_id).first()
+    model_query = select(db_models.Model).filter(db_models.Model.id == model_id)
+    model_result = await db.execute(model_query)
+    model = model_result.scalars().first()
+    
     if not model:
         raise HTTPException(status_code=404, detail="Модель не найдена")
     
-    videos = db.query(db_models.ModelVideo).filter(
+    query = select(db_models.ModelPhoto).filter(
+        db_models.ModelPhoto.model_id == model_id
+    ).order_by(db_models.ModelPhoto.sort_order)
+    
+    result = await db.execute(query)
+    photos = result.scalars().all()
+    
+    return photos
+
+@router.get("/models/{model_id}/videos", response_model=List[schemas.ModelVideo])
+async def get_model_videos(model_id: int, db: AsyncSession = Depends(get_db)):
+    """Получить видео модели"""
+    # Проверяем существование модели
+    model_query = select(db_models.Model).filter(db_models.Model.id == model_id)
+    model_result = await db.execute(model_query)
+    model = model_result.scalars().first()
+    
+    if not model:
+        raise HTTPException(status_code=404, detail="Модель не найдена")
+    
+    query = select(db_models.ModelVideo).filter(
         db_models.ModelVideo.model_id == model_id
-    ).order_by(db_models.ModelVideo.sort_order).all()
+    ).order_by(db_models.ModelVideo.sort_order)
+    
+    result = await db.execute(query)
+    videos = result.scalars().all()
     
     return videos
 
 @router.get("/models/filter")
 async def filter_models(
     specs: Optional[str] = Query(None, description="JSON строка с фильтрами по характеристикам"),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Фильтрация моделей по характеристикам"""
     import json
@@ -126,25 +174,27 @@ async def filter_models(
         raise HTTPException(status_code=400, detail="Неверный формат JSON в параметре specs")
     
     # Получаем все активные модели
-    models_query = db.query(db_models.Model).filter(db_models.Model.is_active == True)
+    models_query = select(db_models.Model).filter(db_models.Model.is_active == True)
     
     # Применяем фильтры по характеристикам
     for spec_name, spec_value in filters.items():
         if spec_value:
             # Подзапрос для поиска моделей с нужной характеристикой
-            subquery = db.query(db_models.ModelSpec.model_id).filter(
+            subquery = select(db_models.ModelSpec.model_id).filter(
                 and_(
                     db_models.ModelSpec.spec_name == spec_name,
                     db_models.ModelSpec.spec_value.ilike(f"%{spec_value}%")
                 )
-            ).subquery()
+            )
             
             models_query = models_query.filter(db_models.Model.id.in_(subquery))
     
-    models = models_query.order_by(db_models.Model.sort_order, db_models.Model.name).all()
+    models_query = models_query.order_by(db_models.Model.sort_order, db_models.Model.name)
+    result = await db.execute(models_query)
+    models = result.scalars().all()
     
     return {
-        "models": [schemas.Model.from_orm(model) for model in models],
+        "models": [schemas.Model.model_validate(model) for model in models],
         "total": len(models),
         "filters_applied": filters
     }
@@ -155,18 +205,20 @@ async def get_news(
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=100),
     search: Optional[str] = Query(None),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Получить список новостей"""
     # Проверяем видимость раздела
-    section_vis = db.query(db_models.SectionVisibility).filter(
+    section_query = select(db_models.SectionVisibility).filter(
         db_models.SectionVisibility.section_name == "news"
-    ).first()
+    )
+    section_result = await db.execute(section_query)
+    section_vis = section_result.scalars().first()
     
     if section_vis and not section_vis.is_visible:
         raise HTTPException(status_code=404, detail="Раздел новостей недоступен")
     
-    query = db.query(db_models.News).filter(db_models.News.is_published == True)
+    query = select(db_models.News).filter(db_models.News.is_published == True)
     
     if search:
         query = query.filter(
@@ -177,31 +229,41 @@ async def get_news(
             )
         )
     
-    news = query.order_by(db_models.News.created_at.desc()).offset(skip).limit(limit).all()
-    return news
+    query = query.order_by(db_models.News.published_at.desc(), db_models.News.created_at.desc())
+    query = query.offset(skip).limit(limit)
+    
+    result = await db.execute(query)
+    news_items = result.scalars().all()
+    
+    return news_items
 
 @router.get("/news/{news_id}", response_model=schemas.News)
-async def get_news_item(news_id: int, db: Session = Depends(get_db)):
+async def get_news_item(news_id: int, db: AsyncSession = Depends(get_db)):
     """Получить новость по ID"""
     # Проверяем видимость раздела
-    section_vis = db.query(db_models.SectionVisibility).filter(
+    section_query = select(db_models.SectionVisibility).filter(
         db_models.SectionVisibility.section_name == "news"
-    ).first()
+    )
+    section_result = await db.execute(section_query)
+    section_vis = section_result.scalars().first()
     
     if section_vis and not section_vis.is_visible:
         raise HTTPException(status_code=404, detail="Раздел новостей недоступен")
     
-    news = db.query(db_models.News).filter(
+    query = select(db_models.News).filter(
         and_(
             db_models.News.id == news_id,
             db_models.News.is_published == True
         )
-    ).first()
+    )
     
-    if not news:
+    result = await db.execute(query)
+    news_item = result.scalars().first()
+    
+    if not news_item:
         raise HTTPException(status_code=404, detail="Новость не найдена")
     
-    return news
+    return news_item
 
 # Эндпоинты для регламентов
 @router.get("/regulations", response_model=List[schemas.Regulation])
@@ -210,18 +272,20 @@ async def get_regulations(
     limit: int = Query(20, ge=1, le=100),
     category: Optional[str] = Query(None),
     search: Optional[str] = Query(None),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Получить список регламентов"""
     # Проверяем видимость раздела
-    section_vis = db.query(db_models.SectionVisibility).filter(
+    section_query = select(db_models.SectionVisibility).filter(
         db_models.SectionVisibility.section_name == "regulations"
-    ).first()
+    )
+    section_result = await db.execute(section_query)
+    section_vis = section_result.scalars().first()
     
     if section_vis and not section_vis.is_visible:
         raise HTTPException(status_code=404, detail="Раздел регламентов недоступен")
     
-    query = db.query(db_models.Regulation).filter(db_models.Regulation.is_published == True)
+    query = select(db_models.Regulation).filter(db_models.Regulation.is_published == True)
     
     if category:
         query = query.filter(db_models.Regulation.category == category)
@@ -235,26 +299,36 @@ async def get_regulations(
             )
         )
     
-    regulations = query.order_by(db_models.Regulation.created_at.desc()).offset(skip).limit(limit).all()
+    query = query.order_by(db_models.Regulation.published_at.desc(), db_models.Regulation.created_at.desc())
+    query = query.offset(skip).limit(limit)
+    
+    result = await db.execute(query)
+    regulations = result.scalars().all()
+    
     return regulations
 
 @router.get("/regulations/{regulation_id}", response_model=schemas.Regulation)
-async def get_regulation(regulation_id: int, db: Session = Depends(get_db)):
+async def get_regulation(regulation_id: int, db: AsyncSession = Depends(get_db)):
     """Получить регламент по ID"""
     # Проверяем видимость раздела
-    section_vis = db.query(db_models.SectionVisibility).filter(
+    section_query = select(db_models.SectionVisibility).filter(
         db_models.SectionVisibility.section_name == "regulations"
-    ).first()
+    )
+    section_result = await db.execute(section_query)
+    section_vis = section_result.scalars().first()
     
     if section_vis and not section_vis.is_visible:
         raise HTTPException(status_code=404, detail="Раздел регламентов недоступен")
     
-    regulation = db.query(db_models.Regulation).filter(
+    query = select(db_models.Regulation).filter(
         and_(
             db_models.Regulation.id == regulation_id,
             db_models.Regulation.is_published == True
         )
-    ).first()
+    )
+    
+    result = await db.execute(query)
+    regulation = result.scalars().first()
     
     if not regulation:
         raise HTTPException(status_code=404, detail="Регламент не найден")
@@ -269,54 +343,64 @@ async def get_employees(
     search: Optional[str] = Query(None),
     department: Optional[str] = Query(None),
     position: Optional[str] = Query(None),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     """Получить список сотрудников"""
     # Проверяем видимость раздела
-    section_vis = db.query(db_models.SectionVisibility).filter(
+    section_query = select(db_models.SectionVisibility).filter(
         db_models.SectionVisibility.section_name == "employees"
-    ).first()
+    )
+    section_result = await db.execute(section_query)
+    section_vis = section_result.scalars().first()
     
     if section_vis and not section_vis.is_visible:
         raise HTTPException(status_code=404, detail="Раздел сотрудников недоступен")
     
-    query = db.query(db_models.Employee).filter(db_models.Employee.is_active == True)
+    query = select(db_models.Employee).filter(db_models.Employee.is_active == True)
+    
+    if position:
+        query = query.filter(db_models.Employee.position.ilike(f"%{position}%"))
     
     if search:
         query = query.filter(
             or_(
-                db_models.Employee.name.ilike(f"%{search}%"),
+                db_models.Employee.first_name.ilike(f"%{search}%"),
+                db_models.Employee.last_name.ilike(f"%{search}%"),
                 db_models.Employee.position.ilike(f"%{search}%"),
                 db_models.Employee.description.ilike(f"%{search}%")
             )
         )
     
-    if department:
-        query = query.filter(db_models.Employee.department.ilike(f"%{department}%"))
+    query = query.order_by(db_models.Employee.sort_order, db_models.Employee.last_name, db_models.Employee.first_name)
+    query = query.offset(skip).limit(limit)
     
-    if position:
-        query = query.filter(db_models.Employee.position.ilike(f"%{position}%"))
+    result = await db.execute(query)
+    employees = result.scalars().all()
     
-    employees = query.order_by(db_models.Employee.sort_order, db_models.Employee.name).offset(skip).limit(limit).all()
     return employees
 
 @router.get("/employees/{employee_id}", response_model=schemas.Employee)
-async def get_employee(employee_id: int, db: Session = Depends(get_db)):
+async def get_employee(employee_id: int, db: AsyncSession = Depends(get_db)):
     """Получить сотрудника по ID"""
     # Проверяем видимость раздела
-    section_vis = db.query(db_models.SectionVisibility).filter(
+    section_query = select(db_models.SectionVisibility).filter(
         db_models.SectionVisibility.section_name == "employees"
-    ).first()
+    )
+    section_result = await db.execute(section_query)
+    section_vis = section_result.scalars().first()
     
     if section_vis and not section_vis.is_visible:
         raise HTTPException(status_code=404, detail="Раздел сотрудников недоступен")
     
-    employee = db.query(db_models.Employee).filter(
+    query = select(db_models.Employee).filter(
         and_(
             db_models.Employee.id == employee_id,
             db_models.Employee.is_active == True
         )
-    ).first()
+    )
+    
+    result = await db.execute(query)
+    employee = result.scalars().first()
     
     if not employee:
         raise HTTPException(status_code=404, detail="Сотрудник не найден")

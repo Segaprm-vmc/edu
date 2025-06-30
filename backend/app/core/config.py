@@ -4,7 +4,7 @@ import os
 
 class Settings(BaseSettings):
     # Database - изменено на SQLite для разработки
-    DATABASE_URL: str = "sqlite+aiosqlite:///./vmcmoto_edu.db"
+    DATABASE_URL: str = "sqlite+aiosqlite:///./moto_education.db"
     
     # Database Pool Settings (не применимо для SQLite, но оставляем для совместимости)
     POOL_SIZE: int = 10
@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     POOL_RECYCLE: int = 3600  # 1 hour
     
     # Security
-    SECRET_KEY: str = "dev-secret-key-change-in-production-123456789"
+    SECRET_KEY: str = "supersecret"
     ADMIN_PASSWORD: str = "admin123"  # Простой пароль для админки
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
@@ -24,12 +24,14 @@ class Settings(BaseSettings):
     ALLOWED_DOCUMENT_EXTENSIONS: set = {".pdf", ".doc", ".docx", ".xls", ".xlsx"}
     
     # CORS
-    CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    CORS_ORIGINS: list[str] = ["*"]  # Для продакшена заменить на свой домен
     
     # App
     PROJECT_NAME: str = "VMC Moto Education Portal"
     VERSION: str = "1.0.0"
     DEBUG: bool = True
+    
+    API_V1_STR: str = "/api"
     
     class Config:
         env_file = ".env"
