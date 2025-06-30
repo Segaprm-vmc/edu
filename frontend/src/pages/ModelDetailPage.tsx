@@ -329,7 +329,6 @@ export default function ModelDetailPage() {
           <div className="py-8">
             {activeTab === 'specs' && (
               <MotorcycleSpecs 
-                modelName={motorcycle.name}
                 specs={getSpecs(motorcycle.id)}
               />
             )}

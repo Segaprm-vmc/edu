@@ -1,4 +1,4 @@
-import React from 'react';
+// AppSidebar component
 import { Link, useLocation } from 'react-router-dom';
 import {
   Sidebar,

@@ -1,4 +1,4 @@
-import React from 'react';
+// WelcomePage component
 import { Link } from 'react-router-dom';
 import { Bike, Users, FileText, Trophy, Clock, Star } from 'lucide-react';
 

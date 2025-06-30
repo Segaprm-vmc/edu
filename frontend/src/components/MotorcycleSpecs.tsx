@@ -11,7 +11,6 @@ interface MotorcycleSpec {
 }
 
 interface MotorcycleSpecsProps {
-  modelName: string;
   specs: MotorcycleSpec[];
   imageUrl?: string;
   onSpecEdit?: (spec: MotorcycleSpec) => void;
@@ -19,7 +18,6 @@ interface MotorcycleSpecsProps {
 }
 
 const MotorcycleSpecs: React.FC<MotorcycleSpecsProps> = ({
-  modelName,
   specs,
   onSpecEdit,
   isAdmin = false
@@ -39,18 +37,6 @@ const MotorcycleSpecs: React.FC<MotorcycleSpecsProps> = ({
       spec.spec_value.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [specs, searchTerm]);
-
-  const categoryNames: Record<string, string> = {
-    engine: 'Двигатель',
-    chassis: 'Шасси и подвеска',
-    brakes: 'Тормозная система',
-    wheels: 'Колеса и шины',
-    dimensions: 'Габариты и масса',
-    electrical: 'Электрооборудование',
-    performance: 'Характеристики производительности',
-    features: 'Дополнительные особенности',
-    other: 'Прочие характеристики'
-  };
 
   return (
     <div className="w-full max-w-none">
@@ -89,7 +75,7 @@ const MotorcycleSpecs: React.FC<MotorcycleSpecsProps> = ({
             {filteredSpecs.map((spec) => (
               <div
                 key={spec.id}
-                className="group bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors"
+                className="group bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors border border-gray-200"
               >
                 <div className="flex justify-between items-start">
                   <div className="flex-1">

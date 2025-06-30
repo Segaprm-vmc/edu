@@ -3,16 +3,16 @@ from typing import Optional, List
 import os
 
 class Settings(BaseSettings):
-    # Database
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:password@localhost:5432/vmcmoto_edu"
+    # Database - изменено на SQLite для разработки
+    DATABASE_URL: str = "sqlite+aiosqlite:///./vmcmoto_edu.db"
     
-    # Database Pool Settings
+    # Database Pool Settings (не применимо для SQLite, но оставляем для совместимости)
     POOL_SIZE: int = 10
     MAX_OVERFLOW: int = 20
     POOL_RECYCLE: int = 3600  # 1 hour
     
     # Security
-    SECRET_KEY: str = "your-secret-key-change-in-production"
+    SECRET_KEY: str = "dev-secret-key-change-in-production-123456789"
     ADMIN_PASSWORD: str = "admin123"  # Простой пароль для админки
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30

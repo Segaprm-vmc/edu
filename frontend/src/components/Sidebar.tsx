@@ -29,7 +29,7 @@ const categories: CategoryItem[] = [
 export default function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const location = useLocation();
+  // const location = useLocation(); // Commented out unused variable
   const [searchParams, setSearchParams] = useSearchParams();
   
   const selectedCategory = searchParams.get('category') || 'all';
