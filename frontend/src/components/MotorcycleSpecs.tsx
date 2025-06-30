@@ -12,7 +12,6 @@ interface MotorcycleSpec {
 
 interface MotorcycleSpecsProps {
   specs: MotorcycleSpec[];
-  imageUrl?: string;
   onSpecEdit?: (spec: MotorcycleSpec) => void;
   isAdmin?: boolean;
 }

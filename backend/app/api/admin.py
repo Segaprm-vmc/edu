@@ -178,6 +178,149 @@ async def delete_model(
     db.commit()
     return {"message": "Модель удалена"}
 
+# CRUD для фотографий моделей
+@router.post("/models/{model_id}/photos", response_model=schemas.ModelPhoto)
+async def upload_model_photo(
+    model_id: int,
+    file: UploadFile = File(...),
+    admin: bool = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """Загрузить фотографию для модели"""
+    # Проверяем существование модели
+    model = db.query(db_models.Model).filter(db_models.Model.id == model_id).first()
+    if not model:
+        raise HTTPException(status_code=404, detail="Модель не найдена")
+    
+    # Проверка типа файла
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="Файл не выбран")
+    
+    file_extension = os.path.splitext(file.filename)[1].lower()
+    if file_extension not in ['.jpg', '.jpeg', '.png', '.webp']:
+        raise HTTPException(
+            status_code=400, 
+            detail="Недопустимый формат файла. Разрешены: jpg, jpeg, png, webp"
+        )
+    
+    try:
+        # Сохраняем файл
+        file_path = await save_uploaded_file(file, f"models/{model_id}")
+        
+        # Получаем размер файла
+        file_content = await file.read()
+        file_size = len(file_content)
+        
+        # Определяем порядок сортировки (следующий по счету)
+        max_sort = db.query(db_models.ModelPhoto).filter(
+            db_models.ModelPhoto.model_id == model_id
+        ).count()
+        
+        # Создаем запись в БД
+        db_photo = db_models.ModelPhoto(
+            model_id=model_id,
+            filename=os.path.basename(file_path),
+            original_filename=file.filename,
+            file_path=file_path,
+            file_size=file_size,
+            sort_order=max_sort + 1
+        )
+        
+        db.add(db_photo)
+        db.commit()
+        db.refresh(db_photo)
+        
+        return db_photo
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Ошибка загрузки файла: {str(e)}")
+
+@router.get("/models/{model_id}/photos", response_model=List[schemas.ModelPhoto])
+async def get_model_photos(
+    model_id: int,
+    admin: bool = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """Получить все фотографии модели"""
+    # Проверяем существование модели
+    model = db.query(db_models.Model).filter(db_models.Model.id == model_id).first()
+    if not model:
+        raise HTTPException(status_code=404, detail="Модель не найдена")
+    
+    photos = db.query(db_models.ModelPhoto).filter(
+        db_models.ModelPhoto.model_id == model_id
+    ).order_by(db_models.ModelPhoto.sort_order).all()
+    
+    return photos
+
+@router.put("/models/{model_id}/photos/order")
+async def update_model_photos_order(
+    model_id: int,
+    photo_ids: List[int],
+    admin: bool = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """Обновить порядок фотографий модели"""
+    # Проверяем существование модели
+    model = db.query(db_models.Model).filter(db_models.Model.id == model_id).first()
+    if not model:
+        raise HTTPException(status_code=404, detail="Модель не найдена")
+    
+    # Обновляем порядок для каждой фотографии
+    for order, photo_id in enumerate(photo_ids, 1):
+        photo = db.query(db_models.ModelPhoto).filter(
+            db_models.ModelPhoto.id == photo_id,
+            db_models.ModelPhoto.model_id == model_id
+        ).first()
+        
+        if photo:
+            photo.sort_order = order
+    
+    db.commit()
+    return {"message": "Порядок фотографий обновлен"}
+
+@router.put("/photos/{photo_id}/primary")
+async def set_primary_photo(
+    photo_id: int,
+    admin: bool = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """Установить фотографию как основную"""
+    photo = db.query(db_models.ModelPhoto).filter(db_models.ModelPhoto.id == photo_id).first()
+    if not photo:
+        raise HTTPException(status_code=404, detail="Фотография не найдена")
+    
+    # Убираем флаг основной у всех фотографий этой модели
+    db.query(db_models.ModelPhoto).filter(
+        db_models.ModelPhoto.model_id == photo.model_id
+    ).update({"is_primary": False})
+    
+    # Устанавливаем флаг основной для выбранной фотографии
+    photo.is_primary = True
+    
+    db.commit()
+    return {"message": "Основная фотография установлена"}
+
+@router.delete("/photos/{photo_id}")
+async def delete_model_photo(
+    photo_id: int,
+    admin: bool = Depends(get_current_admin),
+    db: Session = Depends(get_db)
+):
+    """Удалить фотографию модели"""
+    photo = db.query(db_models.ModelPhoto).filter(db_models.ModelPhoto.id == photo_id).first()
+    if not photo:
+        raise HTTPException(status_code=404, detail="Фотография не найдена")
+    
+    # Удаляем файл с диска
+    delete_file(photo.file_path)
+    
+    # Удаляем запись из БД
+    db.delete(photo)
+    db.commit()
+    
+    return {"message": "Фотография удалена"}
+
 # CRUD для видео моделей
 @router.post("/models/{model_id}/videos", response_model=schemas.ModelVideo)
 async def create_model_video(

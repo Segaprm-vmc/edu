@@ -38,13 +38,14 @@ export interface ModelPhoto {
 }
 
 export interface ModelSpec {
-  id: number;
-  model_id: number;
+  id?: number;
+  model_id?: number;
   spec_name: string;
   spec_value: string;
   spec_unit?: string;
-  sort_order: number;
-  created_at: string;
+  category?: string;
+  sort_order?: number;
+  created_at?: string;
 }
 
 export interface News {
@@ -274,20 +275,47 @@ class ApiService {
     return response.data;
   }
 
+  // Управление фотографиями моделей
+  async getModelPhotos(modelId: number): Promise<ModelPhoto[]> {
+    const response = await this.client.get(`/admin/models/${modelId}/photos`);
+    return response.data;
+  }
+
+  async updatePhotosOrder(modelId: number, photoIds: number[]): Promise<void> {
+    await this.client.put(`/admin/models/${modelId}/photos/order`, photoIds);
+  }
+
+  async setPrimaryPhoto(photoId: number): Promise<void> {
+    await this.client.put(`/admin/photos/${photoId}/primary`);
+  }
+
   async deleteModelPhoto(photoId: number): Promise<void> {
     await this.client.delete(`/admin/photos/${photoId}`);
   }
 
   // Управление техническими характеристиками
-  async updateModelSpecs(modelId: number, specs: Partial<ModelSpec>[]): Promise<ModelSpec[]> {
-    const response = await this.client.put(`/admin/models/${modelId}/specs`, { specs });
+  async getModelSpecs(modelId: number): Promise<ModelSpec[]> {
+    const response = await this.client.get(`/models/${modelId}/specs`);
     return response.data;
   }
 
-  async importSpecsFromExcel(modelId: number, file: File, replaceExisting = false): Promise<any> {
+  async createModelSpec(modelId: number, spec: ModelSpec): Promise<ModelSpec> {
+    const response = await this.client.post(`/admin/models/${modelId}/specs`, spec);
+    return response.data;
+  }
+
+  async updateModelSpec(specId: number, spec: Partial<ModelSpec>): Promise<ModelSpec> {
+    const response = await this.client.put(`/admin/specs/${specId}`, spec);
+    return response.data;
+  }
+
+  async deleteModelSpec(specId: number): Promise<void> {
+    await this.client.delete(`/admin/specs/${specId}`);
+  }
+
+  async importModelSpecsFromExcel(modelId: number, file: File): Promise<{ imported: number; updated: number; total_processed: number }> {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('replace_existing', replaceExisting.toString());
     
     const response = await this.client.post(`/admin/models/${modelId}/specs/import`, formData, {
       headers: {
@@ -297,10 +325,8 @@ class ApiService {
     return response.data;
   }
 
-  async exportSpecsToExcel(modelId: number): Promise<Blob> {
-    const response = await this.client.get(`/admin/models/${modelId}/specs/export`, {
-      responseType: 'blob',
-    });
+  async bulkUpdateModelSpecs(modelId: number, specs: ModelSpec[]): Promise<{ updated: number; created: number; total_processed: number }> {
+    const response = await this.client.put(`/admin/models/${modelId}/specs/bulk`, { specs });
     return response.data;
   }
 

@@ -24,7 +24,6 @@ interface MotorcycleModel {
   description: string;
   fullDescription: string;
   features: string[];
-  imageUrl?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;

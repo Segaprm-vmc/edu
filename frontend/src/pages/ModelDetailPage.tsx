@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { 
   ArrowLeft, 
@@ -11,6 +11,7 @@ import {
   Shield
 } from 'lucide-react';
 import MotorcycleSpecs from '../components/MotorcycleSpecs';
+import { apiService, ModelPhoto } from '../services/api';
 
 // Данные мотоциклов
 const motorcycles = {
@@ -123,11 +124,46 @@ const motorcycles = {
 };
 
 export default function ModelDetailPage() {
-  const { id } = useParams<{ id: string }>();
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const { motorcycleId } = useParams<{ motorcycleId: string }>();
   const [activeTab, setActiveTab] = useState<'specs' | 'features'>('specs');
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [photos, setPhotos] = useState<ModelPhoto[]>([]);
+  const [isLoadingPhotos, setIsLoadingPhotos] = useState(false);
 
-  const motorcycle = id ? motorcycles[id as keyof typeof motorcycles] : null;
+  const motorcycle = motorcycleId ? motorcycles[motorcycleId as keyof typeof motorcycles] : null;
+
+  // Загрузка фотографий модели
+  useEffect(() => {
+    const loadPhotos = async () => {
+      if (motorcycle?.id) {
+        // Попробуем получить численный ID из строкового ID
+        const numericId = parseInt(motorcycle.id.split('-').pop() || '0');
+        if (numericId > 0) {
+          setIsLoadingPhotos(true);
+          try {
+            const modelPhotos = await apiService.getModelPhotos(numericId);
+            setPhotos(modelPhotos.sort((a, b) => a.sort_order - b.sort_order));
+          } catch (error) {
+            console.error('Ошибка загрузки фотографий:', error);
+            setPhotos([]);
+          } finally {
+            setIsLoadingPhotos(false);
+          }
+        }
+      }
+    };
+
+    loadPhotos();
+  }, [motorcycle?.id]);
+
+  // Функция для получения URL фотографии
+  const getPhotoUrl = (photo: ModelPhoto) => {
+    return `/static/uploads/${photo.file_path}`;
+  };
+
+  // Получение основной фотографии или первой по порядку
+  const primaryPhoto = photos.find(photo => photo.is_primary) || photos[0];
+  const currentPhoto = photos[currentImageIndex] || primaryPhoto;
 
   if (!motorcycle) {
     return (
@@ -245,8 +281,18 @@ export default function ModelDetailPage() {
           {/* Левая колонка - Изображения */}
           <div className="space-y-4">
             {/* Основное изображение */}
-            <div className={`aspect-[4/3] bg-gradient-to-br ${motorcycle.color} rounded-xl overflow-hidden relative flex items-center justify-center shadow-lg`}>
-              <motorcycle.icon className="w-40 h-40 text-white/30" />
+            <div className="aspect-[4/3] rounded-xl overflow-hidden relative shadow-lg bg-gray-100">
+              {currentPhoto ? (
+                <img
+                  src={getPhotoUrl(currentPhoto)}
+                  alt={motorcycle.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className={`w-full h-full bg-gradient-to-br ${motorcycle.color} flex items-center justify-center`}>
+                  <motorcycle.icon className="w-40 h-40 text-white/30" />
+                </div>
+              )}
               
               {/* Кнопки действий */}
               <div className="absolute top-4 right-4 flex space-x-2">
@@ -264,22 +310,85 @@ export default function ModelDetailPage() {
                   Доступен
                 </span>
               </div>
+
+              {/* Навигация между фотографиями */}
+              {photos.length > 1 && (
+                <>
+                  <button
+                    onClick={() => setCurrentImageIndex(prev => prev > 0 ? prev - 1 : photos.length - 1)}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => setCurrentImageIndex(prev => prev < photos.length - 1 ? prev + 1 : 0)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </>
+              )}
+
+              {/* Индикатор позиции */}
+              {photos.length > 1 && (
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
+                  {photos.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentImageIndex(index)}
+                      className={`w-2 h-2 rounded-full transition-colors ${
+                        currentImageIndex === index ? 'bg-white' : 'bg-white/50'
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Миниатюры изображений */}
-            <div className="grid grid-cols-6 gap-2">
-              {[...Array(6)].map((_, index) => (
-                <button
-                  key={index}
-                  className={`aspect-square bg-gradient-to-br ${motorcycle.color} rounded-lg overflow-hidden relative flex items-center justify-center ${
-                    currentImageIndex === index ? 'ring-2 ring-red-500' : ''
-                  }`}
-                  onClick={() => setCurrentImageIndex(index)}
-                >
-                  <motorcycle.icon className="w-4 h-4 text-white/50" />
-                </button>
-              ))}
-            </div>
+            {photos.length > 0 && (
+              <div className="grid grid-cols-6 gap-2">
+                {photos.slice(0, 6).map((photo, index) => (
+                  <button
+                    key={photo.id}
+                    className={`aspect-square rounded-lg overflow-hidden relative ${
+                      currentImageIndex === index ? 'ring-2 ring-red-500' : 'ring-1 ring-gray-200'
+                    }`}
+                    onClick={() => setCurrentImageIndex(index)}
+                  >
+                    <img
+                      src={getPhotoUrl(photo)}
+                      alt={`${motorcycle.name} - фото ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                    {photo.is_primary && (
+                      <div className="absolute top-1 left-1 bg-yellow-400 rounded-full p-1">
+                        <div className="w-1 h-1 bg-yellow-900 rounded-full"></div>
+                      </div>
+                    )}
+                  </button>
+                ))}
+                {photos.length > 6 && (
+                  <div className="aspect-square rounded-lg bg-gray-100 flex items-center justify-center text-xs text-gray-500">
+                    +{photos.length - 6}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Загрузка фотографий */}
+            {isLoadingPhotos && (
+              <div className="text-center py-4">
+                <div className="text-sm text-gray-500">Загрузка фотографий...</div>
+              </div>
+            )}
+
+            {/* Сообщение об отсутствии фотографий */}
+            {!isLoadingPhotos && photos.length === 0 && (
+              <div className="text-center py-4">
+                <div className="text-sm text-gray-500">Фотографии не загружены</div>
+              </div>
+            )}
           </div>
 
           {/* Правая колонка - Информация */}
