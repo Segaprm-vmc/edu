@@ -195,6 +195,45 @@
   @apply bg-gray-400;
 }
 
+/* Dark sidebar scrollbar */
+.dark-sidebar-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dark-sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dark-sidebar-scroll::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.3);
+  border-radius: 6px;
+  transition: background 0.3s ease;
+}
+
+.dark-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.5);
+}
+
+/* VMC Modern Sidebar Styles */
+@keyframes sidebar-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(239, 68, 68, 0);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.1);
+  }
+}
+
+.sidebar-glow {
+  animation: sidebar-glow 3s ease-in-out infinite;
+}
+
+.backdrop-blur-glass {
+  backdrop-filter: blur(16px) saturate(180%);
+  background-color: rgba(17, 24, 39, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.125);
+}
+
 /* Firefox scrollbar */
 * {
   scrollbar-width: thin;

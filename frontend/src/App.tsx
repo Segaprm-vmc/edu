@@ -10,6 +10,7 @@ import RegulationsPage from './pages/RegulationsPage';
 import EmployeesPage from './pages/EmployeesPage';
 import AdminPage from './pages/AdminPage';
 import AdminLoginPage from './pages/AdminLoginPage';
+import SidebarDemoPage from './pages/SidebarDemoPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 // Loading компонент
@@ -82,6 +83,9 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+            
+            {/* Демонстрационная страница сайдбара */}
+            <Route path="/sidebar-demo" element={<SidebarDemoPage />} />
             
             {/* Обычные страницы с MainLayout */}
             <Route path="/*" element={
