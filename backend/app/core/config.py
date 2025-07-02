@@ -19,9 +19,17 @@ class Settings(BaseSettings):
     
     # File storage
     UPLOAD_DIR: str = "app/static/uploads"
-    MAX_FILE_SIZE: int = 10 * 1024 * 1024  # 10MB
+    MAX_FILE_SIZE: int = 50 * 1024 * 1024  # 50MB
     ALLOWED_IMAGE_EXTENSIONS: set = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
     ALLOWED_DOCUMENT_EXTENSIONS: set = {".pdf", ".doc", ".docx", ".xls", ".xlsx"}
+    ALLOWED_VIDEO_EXTENSIONS: set = {".mp4", ".mov", ".avi", ".wmv", ".mkv"}
+    ALLOWED_AUDIO_EXTENSIONS: set = {".mp3", ".wav", ".flac", ".aac", ".ogg"}
+    
+    # File Manager Settings
+    THUMBNAIL_SIZE: tuple = (300, 300)
+    THUMBNAIL_QUALITY: int = 85
+    IMAGE_OPTIMIZATION_QUALITY: int = 85
+    MAX_THUMBNAIL_SIZE: int = 500 * 1024  # 500KB for thumbnails
     
     # CORS
     CORS_ORIGINS: list[str] = ["*"]  # Для продакшена заменить на свой домен

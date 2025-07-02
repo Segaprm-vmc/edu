@@ -3,6 +3,7 @@ import { Save, X, Plus, Trash2 } from 'lucide-react';
 import PhotoManager from './PhotoManager';
 import SpecsExcelImport from './SpecsExcelImport';
 import { apiService, ModelPhoto, ModelSpec } from '../services/api';
+import MotorcyclePhotoUpload from "./MotorcyclePhotoUpload";
 
 // Интерфейс модели мотоцикла
 interface MotorcycleModel {
@@ -393,6 +394,15 @@ const ModelForm: React.FC<ModelFormProps> = ({ model, categories, onSave, onCanc
               {errors.category && <p className="text-red-600 text-sm mt-1">{errors.category}</p>}
             </div>
           </div>
+
+          {/* Загрузка фото для новой модели */}
+          {!model?.id && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Фотография модели</label>
+              <MotorcyclePhotoUpload motorcycleId={-1} />
+              <p className="text-xs text-gray-500 mt-1">Фото можно загрузить после сохранения модели.</p>
+            </div>
+          )}
 
           {/* Описания */}
           <div className="space-y-4">

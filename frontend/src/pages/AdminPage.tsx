@@ -73,74 +73,7 @@ const AdminPage: React.FC = () => {
 
   // Загрузка моделей (пока мок данные)
   useEffect(() => {
-    const mockModels: MotorcycleModel[] = [
-      {
-        id: 'vmc-sport-450',
-        name: 'VMC Sport 450',
-        category: 'Мотоциклы',
-        year: 2024,
-        price: 'По запросу',
-        description: 'Спортивный мотоцикл для динамичной езды',
-        fullDescription: 'VMC Sport 450 — это воплощение спортивного духа и передовых технологий.',
-        features: ['Мощный двигатель 450cc', 'Спортивная посадка', 'LED-освещение'],
-        isActive: true,
-        createdAt: '2024-01-15',
-        updatedAt: '2024-01-15'
-      },
-      {
-        id: 'vmc-cruiser-650',
-        name: 'VMC Cruiser 650',
-        category: 'Мотоциклы',
-        year: 2024,
-        price: 'По запросу',
-        description: 'Комфортный круизер для дальних поездок',
-        fullDescription: 'VMC Cruiser 650 создан для тех, кто ценит комфорт в путешествиях.',
-        features: ['Двигатель V-twin 650cc', 'Удобная посадка', 'Хромированные детали'],
-        isActive: true,
-        createdAt: '2024-01-10',
-        updatedAt: '2024-01-10'
-      },
-      {
-        id: 'vmc-adventure-800',
-        name: 'VMC Adventure 800',
-        category: 'Эндуро',
-        year: 2024,
-        price: 'По запросу',
-        description: 'Приключенческий мотоцикл для любых дорог',
-        fullDescription: 'VMC Adventure 800 — универсальный мотоцикл для искателей приключений.',
-        features: ['Мощный двигатель 800cc', 'Регулируемая подвеска', 'Защита двигателя'],
-        isActive: true,
-        createdAt: '2024-01-05',
-        updatedAt: '2024-01-05'
-      },
-      {
-        id: 'vmc-enduro-250',
-        name: 'VMC Enduro 250',
-        category: 'Эндуро',
-        year: 2024,
-        price: 'По запросу',
-        description: 'Настоящий внедорожник для бездорожья',
-        fullDescription: 'VMC Enduro 250 создан для покорения самых сложных маршрутов.',
-        features: ['Двигатель 250cc', 'Длинноходная подвеска', 'Защита двигателя'],
-        isActive: true,
-        createdAt: '2024-01-01',
-        updatedAt: '2024-01-01'
-      },
-      {
-        id: 'vmc-scooter-150',
-        name: 'VMC Scooter 150',
-        category: 'Скутеры',
-        year: 2024,
-        price: 'По запросу',
-        description: 'Идеальный городской транспорт',
-        fullDescription: 'VMC Scooter 150 — экономичный и маневренный скутер для города.',
-        features: ['Двигатель 150cc', 'Автоматическая трансмиссия', 'Большой багажник'],
-        isActive: true,
-        createdAt: '2023-12-25',
-        updatedAt: '2023-12-25'
-      }
-    ];
-    setModels(mockModels);
+    setModels([]); // Удалены все мок-данные
   }, []);
 
   // Фильтрация моделей

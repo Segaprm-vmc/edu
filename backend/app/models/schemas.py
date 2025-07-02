@@ -292,12 +292,25 @@ class SectionVisibility(SectionVisibilityBase):
 
 # Схемы для аутентификации
 class LoginRequest(BaseModel):
+    username: str  # Изменено с password на username + password
     password: str
+    remember_me: bool = False
 
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     expires_in: int
+    user: AdminUserSimple
+
+class CurrentUser(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    username: str
+    email: str
+    full_name: Optional[str] = None
+    role: AdminRole
+    permissions: List[str] = []
 
 # Алиас для совместимости
 Token = TokenResponse
@@ -354,4 +367,220 @@ class PaginatedResponse(BaseModel):
 
 class MessageResponse(BaseModel):
     message: str
-    detail: Optional[str] = None 
+    detail: Optional[str] = None
+
+# Схемы для админ-ролей
+class AdminRoleBase(BaseModel):
+    name: str
+    description: Optional[str] = None
+    permissions: Optional[List[str]] = []
+    is_active: bool = True
+
+class AdminRoleCreate(AdminRoleBase):
+    pass
+
+class AdminRoleUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    permissions: Optional[List[str]] = None
+    is_active: Optional[bool] = None
+
+class AdminRole(AdminRoleBase):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    created_at: datetime
+
+# Схемы для админ-пользователей
+class AdminUserBase(BaseModel):
+    username: str
+    email: EmailStr
+    full_name: Optional[str] = None
+    role_id: int
+    is_active: bool = True
+    is_verified: bool = False
+
+class AdminUserCreate(AdminUserBase):
+    password: str
+
+class AdminUserUpdate(BaseModel):
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
+    full_name: Optional[str] = None
+    role_id: Optional[int] = None
+    is_active: Optional[bool] = None
+    is_verified: Optional[bool] = None
+    password: Optional[str] = None
+
+class AdminUserChangePassword(BaseModel):
+    current_password: str
+    new_password: str
+
+class AdminUser(AdminUserBase):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    last_login: Optional[datetime] = None
+    failed_login_attempts: int = 0
+    password_changed_at: Optional[datetime] = None
+    created_at: datetime
+    updated_at: Optional[datetime] = None
+    
+    # Связанные объекты
+    role: Optional[AdminRole] = None
+
+class AdminUserSimple(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    username: str
+    email: str
+    full_name: Optional[str] = None
+    is_active: bool
+
+# Схемы для аудит-логов
+class AdminAuditLogBase(BaseModel):
+    action: str
+    resource_type: Optional[str] = None
+    resource_id: Optional[str] = None
+    description: Optional[str] = None
+    ip_address: Optional[str] = None
+    user_agent: Optional[str] = None
+
+class AdminAuditLogCreate(AdminAuditLogBase):
+    user_id: int
+    request_data: Optional[dict] = None
+
+class AdminAuditLog(AdminAuditLogBase):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    user_id: int
+    request_data: Optional[dict] = None
+    created_at: datetime
+    
+    # Связанные объекты
+    user: Optional[AdminUserSimple] = None
+
+# Схемы для настроек сайта
+class SiteSettingsBase(BaseModel):
+    key: str
+    value: Optional[dict] = None
+    value_type: str = 'string'
+    category: str = 'general'
+    description: Optional[str] = None
+    is_public: bool = False
+
+class SiteSettingsCreate(SiteSettingsBase):
+    pass
+
+class SiteSettingsUpdate(BaseModel):
+    value: Optional[dict] = None
+    value_type: Optional[str] = None
+    category: Optional[str] = None
+    description: Optional[str] = None
+    is_public: Optional[bool] = None
+
+class SiteSettings(SiteSettingsBase):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    created_at: datetime
+    updated_at: Optional[datetime] = None
+
+# Схемы для файлового менеджера
+class FileManagerBase(BaseModel):
+    filename: str
+    original_filename: Optional[str] = None
+    file_path: str
+    file_size: Optional[int] = None
+    mime_type: Optional[str] = None
+    file_type: Optional[str] = None
+    alt_text: Optional[str] = None
+    description: Optional[str] = None
+    tags: Optional[List[str]] = []
+    folder: str = 'uploads'
+    is_public: bool = True
+
+class FileManagerCreate(FileManagerBase):
+    uploaded_by: Optional[int] = None
+
+class FileManagerUpdate(BaseModel):
+    alt_text: Optional[str] = None
+    description: Optional[str] = None
+    tags: Optional[List[str]] = None
+    folder: Optional[str] = None
+    is_public: Optional[bool] = None
+
+class FileManager(FileManagerBase):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    uploaded_by: Optional[int] = None
+    created_at: datetime
+    
+    # Связанные объекты
+    uploaded_by_user: Optional[AdminUserSimple] = None
+
+# Схемы для статистики Dashboard
+class DashboardStats(BaseModel):
+    total_models: int
+    total_news: int
+    total_employees: int
+    total_regulations: int
+    active_models: int
+    published_news: int
+    recent_uploads: int
+    total_file_size: int
+
+class RecentActivity(BaseModel):
+    action: str
+    resource_type: str
+    resource_name: str
+    user_name: str
+    created_at: datetime
+
+class DashboardData(BaseModel):
+    stats: DashboardStats
+    recent_activities: List[RecentActivity]
+    top_models: List[dict]
+    file_usage: dict
+
+# Фильтры для новых сущностей
+class AdminUserFilter(BaseModel):
+    search: Optional[str] = None
+    role_id: Optional[int] = None
+    is_active: Optional[bool] = None
+    is_verified: Optional[bool] = None
+    page: int = 1
+    size: int = 20
+
+class AdminAuditLogFilter(BaseModel):
+    user_id: Optional[int] = None
+    action: Optional[str] = None
+    resource_type: Optional[str] = None
+    date_from: Optional[datetime] = None
+    date_to: Optional[datetime] = None
+    page: int = 1
+    size: int = 50
+
+class FileManagerFilter(BaseModel):
+    search: Optional[str] = None
+    file_type: Optional[str] = None
+    folder: Optional[str] = None
+    uploaded_by: Optional[int] = None
+    date_from: Optional[datetime] = None
+    date_to: Optional[datetime] = None
+    page: int = 1
+    size: int = 20
+
+# Bulk операции
+class BulkAction(BaseModel):
+    action: str  # delete, activate, deactivate, etc.
+    ids: List[int]
+
+class BulkResult(BaseModel):
+    success: int
+    failed: int
+    total: int
+    errors: List[str] = [] 

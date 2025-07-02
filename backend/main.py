@@ -133,6 +133,10 @@ async def root():
 app.include_router(public.router, prefix="/api", tags=["public"])
 app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
 
+# Add the new admin API router
+from app.api.admin_v2 import router as admin_v2_router
+app.include_router(admin_v2_router, prefix="/api/admin/v2", tags=["admin-v2"])
+
 # Health check
 @app.get("/health")
 async def health_check():
