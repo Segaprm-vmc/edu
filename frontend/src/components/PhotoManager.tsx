@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { 
-  Upload, 
-  X, 
+  Upload,
   Star, 
   Trash2, 
   Move, 
