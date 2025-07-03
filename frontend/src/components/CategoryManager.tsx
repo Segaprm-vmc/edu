@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Plus, Edit3, Trash2, Save, X, Tag } from 'lucide-react';
 
 interface Category {

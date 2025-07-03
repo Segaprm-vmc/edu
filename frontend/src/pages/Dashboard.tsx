@@ -1,19 +1,14 @@
-import React from 'react';
 import { 
   TrendingUp, 
   Users, 
   Bike, 
   FileText, 
-  ArrowRight, 
-  Star,
-  Calendar,
+  ArrowRight,
   Eye,
   Heart,
   MessageCircle,
-  Download,
   Activity,
-  Award,
-  Zap
+  Award
 } from 'lucide-react';
 
 export default function Dashboard() {

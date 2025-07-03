@@ -6,10 +6,7 @@ import {
   Trash2,
   Search,
   ArrowLeft,
-  Bike,
-  Save,
-  X,
-
+  Bike
 } from 'lucide-react';
 import ModelForm from '../components/ModelForm';
 import CategoryManager from '../components/CategoryManager';
@@ -201,15 +198,7 @@ const AdminPage: React.FC = () => {
     count: models.filter(model => model.category === category.name).length
   }));
 
-  // Добавление новой пользовательской категории
-  const addCustomCategory = (categoryName: string) => {
-    const newCategory: Category = {
-      id: `custom-${Date.now()}`,
-      name: categoryName,
-      count: 0
-    };
-    setCategories(prev => [...prev, newCategory]);
-  };
+
 
   if (!isAuthenticated) {
     return null; // Переход к login page происходит в useEffect

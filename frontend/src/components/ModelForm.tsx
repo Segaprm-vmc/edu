@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Save, X, Plus, Trash2 } from 'lucide-react';
+import { Save, X } from 'lucide-react';
 import PhotoManager from './PhotoManager';
 import SpecsExcelImport from './SpecsExcelImport';
 import { apiService, ModelPhoto, ModelSpec } from '../services/api';
